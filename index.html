@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Management System</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+display:flex;
+min-height:100vh;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:10px;
+border:none;
+border-radius:10px;
+background:#334155;
+color:white;
+}
+
+button{
+padding:10px 15px;
+border:none;
+border-radius:10px;
+background:#2563eb;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+select{
+width:100%;
+padding:15px;
+border:none;
+border-radius:12px;
+background:#1f2937;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+.sidebar{
+width:260px;
+background:#111827;
+padding:25px;
+box-shadow:5px 0 20px rgba(0,0,0,.3);
+}
+
+.logo{
+font-size:24px;
+font-weight:bold;
+margin-bottom:30px;
+text-align:center;
+}
+
+.menu{
+list-style:none;
+}
+
+.menu li{
+padding:15px;
+margin-bottom:10px;
+background:#1f2937;
+border-radius:12px;
+cursor:pointer;
+transition:.3s;
+}
+
+.menu li:hover{
+background:#2563eb;
+transform:translateX(5px);
+}
+
+.main{
+flex:1;
+padding:25px;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+}
+
+.avatar{
+width:50px;
+height:50px;
+border-radius:50%;
+background:#3b82f6;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-bottom:25px;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:18px;
+box-shadow:0 0 15px rgba(0,0,0,.25);
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.card h3{
+color:#94a3b8;
+font-size:15px;
+}
+
+.card p{
+font-size:30px;
+font-weight:bold;
+margin-top:10px;
+}
+
+.section{
+background:#1e293b;
+padding:20px;
+border-radius:18px;
+margin-bottom:20px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th{
+background:#334155;
+}
+
+th,td{
+padding:14px;
+text-align:center;
+}
+
+tr:nth-child(even){
+background:#293548;
+}
+
+.rank1{
+color:gold;
+font-weight:bold;
+}
+
+.rank2{
+color:silver;
+font-weight:bold;
+}
+
+.rank3{
+color:#cd7f32;
+font-weight:bold;
+}
+
+.progress{
+height:12px;
+background:#334155;
+border-radius:10px;
+overflow:hidden;
+margin-top:10px;
+}
+
+.progress div{
+height:100%;
+width:87%;
+background:#22c55e;
+}
+
+.page{
+display:none;
+}
+
+#dashboard{
+display:block;
+}
+
+@media(max-width:900px){
+
+body{
+flex-direction:column;
+}
+
+.sidebar{
+width:100%;
+}
+
+}
+
+#notification{
+position:fixed;
+top:20px;
+right:20px;
+background:#22c55e;
+padding:15px;
+border-radius:10px;
+display:none;
+}
+
+.light-theme{
+background:#f3f4f6;
+color:#000;
+}
+
+.light-theme .sidebar{
+background:#e5e7eb;
+}
+
+.light-theme .card,
+.light-theme .section{
+background:white;
+color:black;
+}
+
+table{
+width:100%;
+table-layout:fixed;
+}
+
+td:last-child{
+width:60px;
+text-align:center;
+}
+
+td button{
+padding:5px 8px;
+font-size:14px;
+white-space:nowrap;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="loginPage">
+
+<h1>🎓 EduRating Login</h1>
+
+<input type="text" id="login" placeholder="Логин">
+
+<input type="password" id="password" placeholder="Пароль">
+
+<button onclick="login()">Войти</button>
+
+</div>
+
+<div id="app" style="display:none;">
+
+<div class="sidebar">
+
+<div class="logo">
+🎓 EduRating
+</div>
+
+<div class="menu">
+
+<select id="menuSelect" onchange="showPage(this.value)">
+
+<option value="dashboard">📊 Панель</option>
+
+<option value="students">👨‍🎓 Ученики</option>
+
+<option value="exams">📝 Экзамены</option>
+
+<option value="rating">🏆 Рейтинг</option>
+
+<option value="analytics">📈 Аналитика</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="main">
+
+<div class="header">
+
+<div>
+<h1>Teacher Dashboard</h1>
+<p>Система оценки экзаменов</p>
+</div>
+
+<div style="display:flex;align-items:center;gap:15px;">
+
+<div id="clock"
+style="
+font-size:18px;
+font-weight:bold;
+">
+00:00:00
+</div>
+
+<div id="bell">🔔</div>
+
+<div id="notification"></div>
+
+<div class="avatar">T</div>
+
+<button onclick="toggleTheme()">
+🌙
+</button>
+
+</div>
+
+</div>
+
+<div id="dashboard" class="page">
+
+<div class="cards">
+
+<div class="card">
+<h3>Ученики</h3>
+<p>328</p>
+</div>
+
+<div class="card">
+<h3>Экзамены</h3>
+<p>15</p>
+</div>
+
+<div class="card">
+<h3>Средний балл</h3>
+<p>87%</p>
+</div>
+
+<div class="card">
+<h3>Лучший ученик</h3>
+<p>Алихан</p>
+</div>
+
+</div>
+
+<div class="section">
+
+<h2>📈 Общая успеваемость</h2>
+
+<p>Прогресс школы</p>
+
+<div class="progress">
+<div></div>
+</div>
+
+</div>
+
+</div>
+
+<div id="students" class="page">
+
+<div class="section">
+
+<h2>👨‍🎓 Ученики</h2>
+
+<input
+type="text"
+id="searchStudent"
+placeholder="Поиск ученика..."
+onkeyup="searchStudent()">
+
+<select onchange="sortClass(this.value)">
+<option value="">Все классы</option>
+<option>10-А</option>
+<option>10-Б</option>
+<option>11-А</option>
+<option>11-Б</option>
+</select>
+
+<input type="text" id="studentName" placeholder="Имя ученика">
+
+<input type="text" id="studentClass" placeholder="Класс">
+
+<button onclick="addStudent()">
+➕ Добавить ученика
+</button>
+
+<br><br>
+
+<table>
+
+<tr>
+<th>Имя</th>
+<th>Класс</th>
+<th>Удалить</th>
+</tr>
+
+<tbody id="studentTable">
+
+<tr>
+<td>Алихан</td>
+<td>11-А</td>
+<td><button onclick="deleteRow(this)">❌</button></td>
+</tr>
+
+<tr>
+<td>Диас</td>
+<td>11-Б</td>
+<td><button onclick="deleteRow(this)">❌</button></td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div id="exams" class="page">
+
+<div class="section">
+
+<h2>📝 Экзамены</h2>
+
+<table>
+
+<input type="date" id="examDate">
+
+<input type="text" id="examSubject"
+placeholder="Предмет">
+
+<input type="number" id="examScore"
+placeholder="Максимальный балл">
+
+<button onclick="addExam()">
+Добавить экзамен
+</button>
+
+<tbody id="examTable"></tbody>
+
+<tr>
+<th>Предмет</th>
+<th>Класс</th>
+<th>Средний балл</th>
+</tr>
+
+<tr>
+<td>Математика</td>
+<td>11-А</td>
+<td>88</td>
+</tr>
+
+<tr>
+<td>Информатика</td>
+<td>11-Б</td>
+<td>91</td>
+</tr>
+
+<tr>
+<td>Физика</td>
+<td>10-А</td>
+<td>84</td>
+</tr>
+
+<tr>
+<td>Химия</td>
+<td>10-Б</td>
+<td>86</td>
+</tr>
+
+<tr><td>История</td><td>11-А</td><td>89</td></tr>
+<tr><td>Биология</td><td>10-А</td><td>85</td></tr>
+<tr><td>География</td><td>9-Б</td><td>87</td></tr>
+<tr><td>Английский</td><td>11-Б</td><td>92</td></tr>
+<tr><td>Казахский язык</td><td>10-Б</td><td>90</td></tr>
+
+</table>
+
+</div>
+
+</div>
+
+<div id="rating" class="page">
+
+<div class="section">
+
+<h2>🏆 Рейтинг учеников</h2>
+
+<table>
+
+<tr>
+<th>Место</th>
+<th>Имя</th>
+<th>Балл</th>
+</tr>
+
+<tr>
+<td class="rank1">🥇 1</td>
+<td>Алихан</td>
+<td>98</td>
+</tr>
+
+<tr>
+<td class="rank2">🥈 2</td>
+<td>Диас</td>
+<td>96</td>
+</tr>
+
+<tr>
+<td class="rank3">🥉 3</td>
+<td>Айгерим</td>
+<td>95</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>Арман</td>
+<td>93</td>
+</tr>
+
+<tr>
+<td>5</td>
+<td>Нурсултан</td>
+<td>92</td>
+</tr>
+
+<tr><td>6</td><td>Ержан</td><td>90</td></tr>
+<tr><td>7</td><td>Аружан</td><td>89</td></tr>
+<tr><td>8</td><td>Темирлан</td><td>88</td></tr>
+<tr><td>9</td><td>Нурасыл</td><td>87</td></tr>
+<tr><td>10</td><td>Мадина</td><td>86</td></tr>
+<tr><td>11</td><td>Данияр</td><td>85</td></tr>
+<tr><td>12</td><td>Сабина</td><td>84</td></tr>
+
+</table>
+
+</div>
+
+</div>
+
+<div id="analytics" class="page">
+
+<div class="section">
+
+<h2>📈 Аналитика</h2>
+
+<p style="margin:10px 0;">
+Средний балл школы: <b>87%</b>
+</p>
+
+<p style="margin:10px 0;">
+Количество учеников: <b>328</b>
+</p>
+
+<p style="margin:10px 0;">
+Количество экзаменов: <b>15</b>
+</p>
+
+<p style="margin:10px 0;">
+Лучший результат: <b>98</b>
+</p>
+
+<div class="card">
+Средний балл 11-А: 89%
+</div>
+
+<div class="card">
+Средний балл 11-Б: 87%
+</div>
+
+<div class="card">
+Отличников: 42
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function showPage(pageId){
+
+const pages = document.querySelectorAll(".page");
+
+pages.forEach(page=>{
+page.style.display="none";
+});
+
+document.getElementById(pageId).style.display="block";
+
+}
+
+function login(){
+
+const login =
+document.getElementById("login").value;
+
+const password =
+document.getElementById("password").value;
+
+if(login.toLowerCase()==="erbol" && password==="1234"){
+
+document.getElementById("loginPage").style.display="none";
+
+document.getElementById("app").style.display="block";
+
+}else{
+
+alert("Неверный логин или пароль");
+
+}
+
+}
+
+function updateClock(){
+
+const now = new Date();
+
+document.getElementById("clock").innerHTML =
+now.toLocaleTimeString('ru-RU');
+
+}
+
+updateClock();
+
+setInterval(updateClock,1000);
+
+function addStudent(){
+
+let name =
+document.getElementById("studentName").value;
+
+let studentClass =
+document.getElementById("studentClass").value;
+
+if(name==="" || studentClass===""){
+alert("Заполните поля");
+return;
+}
+
+let table =
+document.getElementById("studentTable");
+
+table.innerHTML += `
+<tr>
+<td>${name}</td>
+<td>${studentClass}</td>
+<td>
+<button onclick="deleteRow(this)">
+❌
+</button>
+</td>
+</tr>
+`;
+
+document.getElementById("studentName").value="";
+document.getElementById("studentClass").value="";
+
+}
+
+function deleteRow(button){
+
+button.parentElement.parentElement.remove();
+
+}
+
+function searchStudent(){
+
+function sortClass(className){
+
+let rows =
+document.querySelectorAll("#studentTable tr");
+
+rows.forEach(row=>{
+
+if(className===""){
+
+row.style.display="";
+
+return;
+
+}
+
+row.style.display =
+row.innerHTML.includes(className)
+? ""
+: "none";
+
+});
+
+}
+
+let input =
+document.getElementById("searchStudent")
+.value.toLowerCase();
+
+let rows =
+document.querySelectorAll("#studentTable tr");
+
+rows.forEach(row=>{
+
+let text =
+row.innerText.toLowerCase();
+
+row.style.display =
+text.includes(input) ? "" : "none";
+
+});
+
+}
+
+function addExam(){
+
+let date =
+document.getElementById("examDate").value;
+
+let subject =
+document.getElementById("examSubject").value;
+
+let score =
+document.getElementById("examScore").value;
+
+document.getElementById("examTable")
+.innerHTML += `
+<tr>
+<td>${date}</td>
+<td>${subject}</td>
+<td>${score}</td>
+<td>
+<button onclick="deleteRow(this)">
+❌
+</button>
+</td>
+</tr>
+`;
+
+showNotification(
+"Экзамен успешно создан"
+);
+
+}
+
+function showNotification(text){
+
+let n =
+document.getElementById("notification");
+
+n.innerHTML=text;
+
+n.style.display="block";
+
+setTimeout(()=>{
+
+n.style.display="none";
+
+},3000);
+
+}
+
+showNotification(
+"Добавлен новый ученик"
+);
+
+function toggleTheme(){
+
+document.body.classList.toggle("light-theme");
+
+}
+
+</script>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<canvas id="myChart"></canvas>
+
+</body>
+</html>
